@@ -1,30 +1,51 @@
 package com.example.demo.users.controllers;
 
 import com.example.demo.users.entities.UserEntity;
+import com.example.demo.users.services.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
+// Convention is : controller --> service --> repository
+
+
 @RestController
 @RequestMapping("/users")
 public class UserController {
-    private Map<Long, UserEntity> users = new HashMap<>();
+
+    @Autowired
+    private UserService userService;
 
     @GetMapping("")
     public List<UserEntity> list(){
-        return new ArrayList<>(users.values());
+        return userService.getAll();
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<UserEntity> retrieve(@PathVariable String id){
+        UserEntity user = userService.getUserById(id);
+        if (user == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
     @PostMapping("/")
-    public UserEntity create(@RequestBody UserEntity newUser){
-        if (!users.isEmpty()){
-            Long id = Collections.max(users.keySet()) + 1L;
-            System.out.println(id);
-            users.put(id, newUser);
-            return users.get(id);
+    public boolean create(@RequestBody UserEntity newUser){
+        userService.saveUser(newUser);
+        return true;
+    }
+
+    @PatchMapping("/{id}/")
+    public ResponseEntity<UserEntity> partialUpdate(@PathVariable String id, @RequestBody UserEntity updateUser){
+        UserEntity user = userService.getUserById(id);
+        if (user == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        System.out.println("1L");
-        users.put(1L, newUser);
-        return users.get(1L);
+        user = userService.updateUserById(id, updateUser); // Updated user
+        return new ResponseEntity<>(user, HttpStatus.OK);
     }
 }
