@@ -20,8 +20,8 @@ public class UserController {
     private UserService userService;
 
     @GetMapping("")
-    public List<UserEntity> list(){
-        return userService.getAll();
+    public ResponseEntity<List<UserEntity>> list(){
+        return new ResponseEntity<>(userService.getAll(), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
@@ -34,9 +34,12 @@ public class UserController {
     }
 
     @PostMapping("/")
-    public boolean create(@RequestBody UserEntity newUser){
+    public ResponseEntity<?> create(@RequestBody UserEntity newUser){
+        if (newUser.getId() != null) {
+            newUser.setId(null);
+        }
         userService.saveUser(newUser);
-        return true;
+        return new ResponseEntity<>(true, HttpStatus.OK);
     }
 
     @PatchMapping("/{id}/")

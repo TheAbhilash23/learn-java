@@ -3,14 +3,10 @@ package com.example.demo.users.services;
 import com.example.demo.users.entities.UserEntity;
 import com.example.demo.users.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 @Component
 public class UserService {
