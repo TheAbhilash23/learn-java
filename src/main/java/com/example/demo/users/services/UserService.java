@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class UserService {
@@ -23,19 +24,32 @@ public class UserService {
         return userRepository.findAll();
     }
 
-    public UserEntity getUserById (String id) {
+    public UserEntity getUserById(String id) {
         return userRepository.findById(id).orElse(null);
     }
 
-    public UserEntity updateUserById (String id, UserEntity userData) {
+    public UserEntity updateUserById(String id, UserEntity userData) {
         UserEntity old = userRepository.findById(id).orElse(null);
         if (old != null) {
-            old.setName(userData.getName() != null && !userData.getName().equals("") ? userData.getName() : old.getName());
-            old.setEmail(userData.getEmail() != null && !userData.getEmail().equals("") ? userData.getEmail() : old.getEmail());
-            old.setDate(userData.getDate() != null && !userData.getDate().equals("") ? userData.getDate() : LocalDateTime.now());
+            // username and date can't change
+            old.setUsername(!userData.getUsername().isBlank() ? userData.getUsername() : old.getUsername());
+            old.setDate(userData.getDate() != null && !userData.getDate().toString().isBlank() ? userData.getDate() : LocalDateTime.now());
+
+            // first name, last name can change
+            old.setFirstName(userData.getFirstName() != null && !userData.getFirstName().isBlank() ? userData.getFirstName() : old.getFirstName());
+            old.setLastName(userData.getLastName() != null && !userData.getLastName().isBlank() ? userData.getLastName() : old.getLastName());
             userRepository.save(old);
             return old;
         }
         return null;
+    }
+
+    public boolean deleteUserById(String id) {
+        Optional<UserEntity> user = userRepository.findById(id);
+        if (user.isPresent()) {
+            userRepository.deleteById(id);
+            return true;
+        }
+        return false;
     }
 }
