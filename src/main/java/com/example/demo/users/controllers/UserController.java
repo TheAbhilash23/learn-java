@@ -1,15 +1,18 @@
 package com.example.demo.users.controllers;
 
-import com.example.demo.controllers.BaseController;
+import com.example.demo.core.controllers.BaseController;
 import com.example.demo.users.entities.UserEntity;
 import com.example.demo.users.services.UserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.ValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 // Convention is : controller --> service --> repository
 
@@ -41,8 +44,21 @@ public class UserController extends BaseController<UserEntity> {
     @PostMapping("/")
     public ResponseEntity<?> create(@RequestBody UserEntity newUser){
         newUser.setId(null);
-        userService.saveUser(newUser);
-        return new ResponseEntity<>(true, HttpStatus.OK);
+        if (newUser.getPassword().isBlank()){
+            return new ResponseEntity<>(
+                    Map.of(
+                            "error", "Password empty",
+                            "message", "Please Enter Password"
+                    ),
+                    HttpStatus.BAD_REQUEST
+            );
+        }
+        try{
+            userService.createUser(newUser);
+            return new ResponseEntity<>(true, HttpStatus.OK);
+        } catch (ValidationException e){
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 
     @Override

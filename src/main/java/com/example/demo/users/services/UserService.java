@@ -2,7 +2,9 @@ package com.example.demo.users.services;
 
 import com.example.demo.users.entities.UserEntity;
 import com.example.demo.users.repository.UserRepository;
+import jakarta.validation.ValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -15,10 +17,36 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
-    public void saveUser(UserEntity user) {
+    // if the PasswordEncoder is not linted, don't worry, it is a bean.
+    private final PasswordEncoder passwordEncoder;
+
+    @Autowired
+    public UserService(UserRepository userRepository,
+                       PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
+
+    private String getHashedPassword(String rawPassword) {
+        return this.passwordEncoder.encode(rawPassword);
+    }
+
+    public boolean verifyPassword(String rawPassword, String encodedPassword) {
+        return passwordEncoder.matches(rawPassword, encodedPassword);
+    }
+
+    public void createUser(UserEntity user) throws ValidationException {
         user.setDate(LocalDateTime.now());
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        boolean isUsernameTaken = userRepository.existsByUsername(user.getUsername());
+        if (isUsernameTaken) {
+            throw new ValidationException("Username already taken.");
+        } else if (userRepository.existsByEmail(user.getEmail())) {
+            throw new ValidationException("Email address already Registered.");
+        }
         userRepository.save(user);
     }
+
 
     public List<UserEntity> getAll() {
         return userRepository.findAll();

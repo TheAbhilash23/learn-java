@@ -1,6 +1,6 @@
 package com.example.demo.journal.controllers;
 
-import com.example.demo.controllers.BaseController;
+import com.example.demo.core.controllers.BaseController;
 import com.example.demo.journal.entities.JournalEntity;
 import com.example.demo.journal.services.JournalService;
 import io.swagger.v3.oas.annotations.tags.Tag;

@@ -3,7 +3,6 @@ package com.example.demo.users.entities;
 import com.example.demo.journal.entities.JournalEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-import lombok.NonNull;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -37,8 +36,7 @@ public class UserEntity {
     @Indexed
     private String email;
 
-    @Schema(description = "Password for the user")
-    @Indexed
+    @Schema(description = "Password for the user", example = "Test@12345")
     private String password;
 
     @Schema(description = "Date when the user was created")
