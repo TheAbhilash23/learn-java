@@ -1,4 +1,4 @@
-FROM openjdk:23-jdk as base
+FROM openjdk:23-jdk AS base
 
 # Install Maven
 RUN apt-get update && \
