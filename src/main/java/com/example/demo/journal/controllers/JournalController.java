@@ -1,6 +1,7 @@
 package com.example.demo.journal.controllers;
 
 import com.example.demo.core.controllers.BaseController;
+import com.example.demo.journal.dto.JournalDto;
 import com.example.demo.journal.entities.JournalEntity;
 import com.example.demo.journal.services.JournalService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -17,7 +18,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/journals")
 @Tag(name = "Journal Management", description = "APIs for managing journal entries")
-public class JournalController extends BaseController<JournalEntity> {
+public class JournalController extends BaseController<JournalEntity, JournalDto> {
 
     @Autowired
     private JournalService journalService;
@@ -40,17 +41,23 @@ public class JournalController extends BaseController<JournalEntity> {
 
     @Override
     @PostMapping("/")
-    public ResponseEntity<?> create(@RequestBody JournalEntity newJournal){
-        if (newJournal.getId() != null) {
-            newJournal.setId(null);
+    public ResponseEntity<?> create(@RequestBody JournalDto newJournal) {
+        try {
+            JournalDto journalDto = new JournalDto();
+            journalDto.setTitle(newJournal.getTitle());
+            journalDto.setContent(newJournal.getContent());
+            journalDto.setUserId(newJournal.getUserId());
+            journalService.saveJournal(journalDto);
+            return new ResponseEntity<>(true, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
-        journalService.saveJournal(newJournal);
-        return new ResponseEntity<>(true, HttpStatus.OK);
     }
 
     @Override
     @PatchMapping("/{id}/")
-    public ResponseEntity<JournalEntity> partialUpdate(@PathVariable String id, @RequestBody JournalEntity updateJournal){
+    public ResponseEntity<JournalEntity> partialUpdate(@PathVariable String id, @RequestBody JournalDto updateJournal){
+
         JournalEntity journal = journalService.getJournalById(id);
         if (journal == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);

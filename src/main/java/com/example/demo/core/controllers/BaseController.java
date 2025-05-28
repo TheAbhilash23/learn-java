@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.http.ResponseEntity;
 
-public abstract class BaseController<T> {
+public abstract class BaseController<T,DT> {
     
     @Operation(summary = "Get all items", description = "Returns a list of all items")
     @ApiResponses(value = {
@@ -26,7 +26,7 @@ public abstract class BaseController<T> {
         @ApiResponse(responseCode = "200", description = "Successfully created item"),
         @ApiResponse(responseCode = "400", description = "Invalid input")
     })
-    public abstract ResponseEntity<?> create(T newItem);
+    public abstract ResponseEntity<?> create(DT newItem);
 
     @Operation(summary = "Update item", description = "Partially updates an existing item")
     @ApiResponses(value = {
@@ -34,7 +34,7 @@ public abstract class BaseController<T> {
         @ApiResponse(responseCode = "404", description = "Item not found"),
         @ApiResponse(responseCode = "400", description = "Invalid input")
     })
-    public abstract ResponseEntity<?> partialUpdate(String id, T updateItem);
+    public abstract ResponseEntity<?> partialUpdate(String id, DT updateItem);
 
     @Operation(summary = "Delete item", description = "Deletes an existing item")
     @ApiResponses(value = {

@@ -13,3 +13,16 @@ services:
     tty: true
     restart: always
 
+  postgres:
+    image: postgres:15
+    container_name: postgres_db
+    restart: always
+    volumes:
+      - .data/postgres_db:/data/db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: application
+    tty: true
